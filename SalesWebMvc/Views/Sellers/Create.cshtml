@@ -1,0 +1,43 @@
+﻿<!--
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+-->
+@model SalesWebMvc.Models.Seller;
+@{
+    ViewData["Title"] = "Create a new Seller";
+
+    <h2>@ViewData["Title"]</h2>
+
+    <h4>Preencha os dados do Seller</h4>
+    <!--pulando uma linha-->
+    <hr />
+
+    <!--o div para dividir a tela e o class row é pra ocupar a largura toda da tela-->
+<div class="row">
+    <!--o comando col-md-4 divide a tela em 1/3 dela, pois o bootstrap divide a tela em 12 partes
+        se por exemplo col-md-6, divide a tela na metade-->
+    <div class="col-md-4">
+        <!--criando o layout do formulario-->
+        <form asp-action="Create">
+            <div class="form-group">
+                <label asp-for="Name" class="control-label"></label>
+                <input asp-for="Name" class="form-control" />
+            </div>
+            <div class="form-group">
+                <label asp-for="Email" class="control-label"></label>
+                <input asp-for="Email" class="form-control" />
+            </div>
+            <div class="form-group">
+                <label asp-for="BirthDate" class="control-label"></label>
+                <input asp-for="BirthDate" class="form-control" />
+            </div>
+            <div class="form-group">
+                <label asp-for="BaseSalary" class="control-label"></label>
+                <input asp-for="BaseSalary" class="form-control" />
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Create" class="btn btn-default" />
+            </div>
+        </form>
+    </div>
+</div>
+}

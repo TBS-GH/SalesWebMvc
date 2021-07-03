@@ -27,5 +27,16 @@ namespace SalesWebMvc.Services
             return _context.Seller.ToList();
             //mai pra frente vamos transformar em operação mais otimizadas AGUARDEEEMMMMM
         }
+
+        //inserindo um novo vendendor no DB
+        public void Insert(Seller obj)
+        {
+            //se usarmos apenas o add. não tem como confirmar que o objeto foi inserido
+            _context.Add(obj);
+
+            //para verificar se o obj vai ser inserio com sucesso no DB temos que usar o
+            //comando .SaveChanges
+            _context.SaveChanges();
+        }
     }
 }
