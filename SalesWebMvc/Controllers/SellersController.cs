@@ -13,9 +13,14 @@ namespace SalesWebMvc.Controllers
         //VAMOS criar uma dependencia para o SellerServices
         private readonly SellerService _sellerService;
 
-        public SellersController(SellerService sellerService)
+        //VAMOS criar uma dependencia para o DepartmentService
+        private readonly DepartmentService _departmentService;
+
+        //construtor
+        public SellersController(SellerService sellerService, DepartmentService departmentService)
         {
             _sellerService = sellerService;
+            _departmentService = departmentService;
         }
 
         public IActionResult Index()
@@ -29,7 +34,15 @@ namespace SalesWebMvc.Controllers
 
         public IActionResult Create()
         {
-            return View();
+            //aqui vamos ter que carregar e buscar do DB todos os departamentos no servico que criamos
+            var departments = _departmentService.FindAll();
+            
+            //vamos instanciar um obj viewModel
+            var viewModel = new SellerFormViewModel { Departments = departments };
+            
+            //feito isso vamos passar o viewModel para o View(), que qnd criar a tela de cadastro pela
+            //primeira vez, ele ja vai receber o obj viewModel com os departamentos populados
+            return View(viewModel);
         }
 
         //queremos indicar que essa ação de baixo (IActionResult Create(Seller seller))

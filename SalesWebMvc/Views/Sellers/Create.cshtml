@@ -1,7 +1,7 @@
 ﻿<!--
     For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 -->
-@model SalesWebMvc.Models.Seller;
+@model SalesWebMvc.Models.SellerFormViewModel;
 @{
     ViewData["Title"] = "Create a new Seller";
 
@@ -19,21 +19,36 @@
         <!--criando o layout do formulario-->
         <form asp-action="Create">
             <div class="form-group">
-                <label asp-for="Name" class="control-label"></label>
-                <input asp-for="Name" class="form-control" />
+                <label asp-for="Seller.Name" class="control-label"></label>
+                <input asp-for="Seller.Name" class="form-control" />
             </div>
             <div class="form-group">
-                <label asp-for="Email" class="control-label"></label>
-                <input asp-for="Email" class="form-control" />
+                <label asp-for="Seller.Email" class="control-label"></label>
+                <input asp-for="Seller.Email" class="form-control" />
             </div>
             <div class="form-group">
-                <label asp-for="BirthDate" class="control-label"></label>
-                <input asp-for="BirthDate" class="form-control" />
+                <label asp-for="Seller.BirthDate" class="control-label"></label>
+                <input asp-for="Seller.BirthDate" class="form-control" />
             </div>
             <div class="form-group">
-                <label asp-for="BaseSalary" class="control-label"></label>
-                <input asp-for="BaseSalary" class="form-control" />
+                <label asp-for="Seller.BaseSalary" class="control-label"></label>
+                <input asp-for="Seller.BaseSalary" class="form-control" />
             </div>
+            <!--o compoente abaixo vai montar pra gente a caixa de seleçaõ do departamento-->
+            <div class="form-group">
+                <!--ele apresenta o label do DepartmentId-->
+                <label asp-for="Seller.DepartmentId" class="control-label"></label>
+                <!--o componente select, que é a caixa de seleção do html-->
+                <!--o taghelper asp-items vai construir os itens da caixa de seleção com base em
+                    uma coleção que vc passar que é feito com arroba(new SelectList() e ele
+                    vai ter 3 argumentos:
+                    1- qual vai ser a fonte de dados desta coleção: Model.Departments (lista de department do view model)
+                    2- qual é o atributo deste obj que vai ser a chave, ou que vai ser o codigo dele (que vai ser o Id)
+                    3- qual o atributo deste obj vai aparecer na caixinha, no caso vai ser o nome
+                    O class="form-control" é um estilo do bootstrap-->
+                <select asp-for="Seller.DepartmentId" asp-items="@(new SelectList(Model.Departments,"Id","Name"))" class="form-control"></select>
+            </div>
+
             <div class="form-group">
                 <input type="submit" value="Create" class="btn btn-default" />
             </div>
