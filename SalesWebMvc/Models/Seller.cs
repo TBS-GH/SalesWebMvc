@@ -13,6 +13,9 @@ namespace SalesWebMvc.Models
         public DateTime BirthDate { get; set; }
         public double BaseSalary { get; set; }
         public Department Department { get; set; }
+        //aqui estamos avisando o entitie do framework pra ele garantir que esse id vai ter que existir,
+        //uma vez que o int não pode ser nulo
+        public int DepartmentId { get; set; } 
         public ICollection<SalesRecord> Sales { get; set; } = new List<SalesRecord>(); //aqui já estamos instanciando a lista
 
         public Seller()

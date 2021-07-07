@@ -31,6 +31,11 @@ namespace SalesWebMvc.Services
         //inserindo um novo vendendor no DB
         public void Insert(Seller obj)
         {
+            //esse comando é só pra garantir que nao apareca o erro da criação de um novo seller
+            //colocando ele no primeiro departamento por default, mais pra frente iremos
+            //fazer uma alteração para selecionar o departamento que ele vai ser alocado
+            obj.Department = _context.Department.First();
+
             //se usarmos apenas o add. não tem como confirmar que o objeto foi inserido
             _context.Add(obj);
 
