@@ -43,5 +43,22 @@ namespace SalesWebMvc.Services
             //comando .SaveChanges
             _context.SaveChanges();
         }
+
+        //aqui vai retornar um vendendor que possui o id informado, se o vendedor nao existir
+        //vai retornar null
+        public Seller FindById(int id)
+        {
+            return _context.Seller.FirstOrDefault(obj => obj.Id == id);
+        }
+
+        public void Remove(int id)
+        {
+            //selecioando o vendedor que sera removido
+            var obj = _context.Seller.Find(id);
+            //aqui estamos removendo do DBset
+            _context.Seller.Remove(obj);
+            //aqui o framework tem que efeitivar lá no banco de dados
+            _context.SaveChanges();
+        }
     }
 }

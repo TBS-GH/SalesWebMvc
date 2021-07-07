@@ -73,5 +73,35 @@ namespace SalesWebMvc.Controllers
             //Da forma descrito abaixo fica mais automatico e não precisa mudar nada aqui
             return RedirectToAction(nameof(Index));
         }
+
+
+        public IActionResult Delete(int? id) //o int? significa que é opicional
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            //buscando do banco de dados o vendedor
+            var obj = _sellerService.FindById(id.Value);
+            //se o id for nulo vamos apresentar esse erro
+            if (obj == null)
+            {
+                return NotFound();
+            }
+
+            return View(obj);
+        }
+
+        //criando o metodo Delete com Post
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult Delete(int id)
+        {
+            //removendo o Seller do DB
+            _sellerService.Remove(id);
+            //vamos redirecionar para tela inical do meu crude
+            return RedirectToAction(nameof(Index));
+        }
     }
 }
