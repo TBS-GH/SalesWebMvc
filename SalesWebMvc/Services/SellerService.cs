@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 
 namespace SalesWebMvc.Services
 {
@@ -48,7 +49,16 @@ namespace SalesWebMvc.Services
         //vai retornar null
         public Seller FindById(int id)
         {
-            return _context.Seller.FirstOrDefault(obj => obj.Id == id);
+            //essa operação abaixo retorna apenas os dados(neste caso o Id) do vendedor,
+            //não é possivel retornar o Departamento dele, para isso devemos fazer:
+            //return _context.Seller.FirstOrDefault(obj => obj.Id == id);
+
+            //devemos incluir a operação .include() que faz parte do namespace
+            //Microsoft.EntityFrameworkCore, ele vai incluir o dado que desejarmos
+            //que no caso é o Departamento. Devemos colocalo antes da operação
+            //FirstOrDefault
+            //essa operação é chamada de EagerLoading
+            return _context.Seller.Include(obj => obj.Department).FirstOrDefault(obj => obj.Id == id);
         }
 
         public void Remove(int id)

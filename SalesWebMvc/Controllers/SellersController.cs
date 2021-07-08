@@ -48,7 +48,7 @@ namespace SalesWebMvc.Controllers
         //queremos indicar que essa ação de baixo (IActionResult Create(Seller seller))
         //seja do tipo POST e não de GET
         //pra fazer isso devemos colocar um anotation( [HttpPost] ) em cima ou antes do método
-        [HttpPost] //anotation de POST
+        [HttpPost] //anotation de POST Action, quando não tiver essa anotação todo o resto vai ser da anotação Action GET
 
         //agora vamos colocar uma segunda anotação, para previnir que nossa aplicação
         //sofra um ataque de CSRF
@@ -74,9 +74,10 @@ namespace SalesWebMvc.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-
+        //criando a logica do controle do link Delete
         public IActionResult Delete(int? id) //o int? significa que é opicional
         {
+            //verifica se o id fornecido é nulo
             if (id == null)
             {
                 return NotFound();
@@ -102,6 +103,26 @@ namespace SalesWebMvc.Controllers
             _sellerService.Remove(id);
             //vamos redirecionar para tela inical do meu crude
             return RedirectToAction(nameof(Index));
+        }
+
+        //criando a logica do controle do link Details
+        public IActionResult Details(int? id) //o int? significa que é opicional
+        {
+            //verifica se o id fornecido é nulo
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            //buscando do banco de dados o vendedor
+            var obj = _sellerService.FindById(id.Value);
+            //se o id for nulo vamos apresentar esse erro
+            if (obj == null)
+            {
+                return NotFound();
+            }
+
+            return View(obj);
         }
     }
 }
