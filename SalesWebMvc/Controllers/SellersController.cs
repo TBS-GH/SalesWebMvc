@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using SalesWebMvc.Models;
 using SalesWebMvc.Services;
+using SalesWebMvc.Services.Exceptions;
 
 namespace SalesWebMvc.Controllers
 {
@@ -123,6 +124,64 @@ namespace SalesWebMvc.Controllers
             }
 
             return View(obj);
+        }
+
+        //metodo Edit para abrir a tela para editar o vendedor
+        public IActionResult Edit(int? id)
+        {
+            //verificando se o id informado é nulo
+            if (id == null)
+            {
+                return NotFound();
+            }
+            //verificando se o id existe no DB
+            var obj = _sellerService.FindById(id.Value);
+            if (obj == null)
+            {
+                return NotFound();
+            }
+
+            //passndo dos teste vamos abrir a tela de edição, para isso temos que abrir a caixa de 
+            //departamentos para povoar minha caixa de seleção
+            List<Department> departments = _departmentService.FindAll();
+
+            //criando um obj do tipo SellerFormViewModel, já passando os dados. O Seller = obj, foi o
+            //objeto que buscamos no DB, como estamos fazendo uma edição, vamos preencher com os dados
+            //do vendedor pré-existente. E passamos também a lista de departamentos
+            SellerFormViewModel viewModel = new SellerFormViewModel { Seller = obj, Departments = departments };
+
+            return View(viewModel);
+        }
+
+        //criando o metodo Edit com Post
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult Edit(int id, Seller seller)
+        {
+            //verificando se o id do URL for difernete do is do Seller
+            if (id != seller.Id)
+            {
+                return BadRequest();
+            }
+
+
+            //essa chamada de .update() ela pode gerar excessões (tanto um NotFoudException quanto
+            //um DbConcurrencyException). Portanto devemos fazer essa chamada dentro de um bloco
+            //try
+            try
+            {
+                _sellerService.Update(seller);
+                //agora vamos redirecionar a requisição para pagina inicial do crude, que é a index
+                return RedirectToAction(nameof(Index));
+            }
+            catch (NotFoundException)
+            {
+                return NotFound();
+            }
+            catch (DbConcurrencyException)
+            {
+                return BadRequest();
+            }
         }
     }
 }

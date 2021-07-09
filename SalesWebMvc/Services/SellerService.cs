@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
+using SalesWebMvc.Services.Exceptions;
 
 namespace SalesWebMvc.Services
 {
@@ -57,7 +58,8 @@ namespace SalesWebMvc.Services
             //Microsoft.EntityFrameworkCore, ele vai incluir o dado que desejarmos
             //que no caso é o Departamento. Devemos colocalo antes da operação
             //FirstOrDefault
-            //essa operação é chamada de EagerLoading
+            //essa operação é chamada de EagerLoading: que é já carregar outros objetos associados
+            //a aquele obj principal
             return _context.Seller.Include(obj => obj.Department).FirstOrDefault(obj => obj.Id == id);
         }
 
@@ -69,6 +71,41 @@ namespace SalesWebMvc.Services
             _context.Seller.Remove(obj);
             //aqui o framework tem que efeitivar lá no banco de dados
             _context.SaveChanges();
+        }
+
+        //aqui vamos atualizar um obj do tipo Seller
+        public void Update(Seller obj)
+        {
+            //primeiramente vamos verificar se o id desse obje tem no DB
+            //o metodo .Any() verifica se existe algum registro no DB com a condição que
+            //vc colocou como parametro. Lembrar que o ! significa se não achar o Id fornecido
+            if (!_context.Seller.Any(x => x.Id == obj.Id))
+            {
+                throw new NotFoundException("Id not found");
+            }
+            //se passar por esse if, significa que vamos atualiza-lo
+            _context.Update(obj);
+            //**********OBSERVAÇÃO*********
+            //quando vc chama a função de atualizar o DB, o DB pode retornar uma excessão
+            //de conflito de concorrencia. Se esse erro ocorrer no DB, o entitie framwork vai
+            //produzir uma excessão chamda de DbUpdateConcurrencyException. Por isso devemos 
+            //colocar um bloco try
+            //*****************************
+            //salvando as alterações no DB
+            try
+            {
+                _context.SaveChanges();
+            }
+            catch(DbConcurrencyException e)
+            {
+                //se acontecer essa excessão aqui, do entitie framework vamos relançar uma outra
+                //excessão em nível de serviço que vai ser a DbConcurrencyException. Isso é muito importante
+                //para segregar as camadas. A camada de serviço não vai porpagar excessoes do nivel de 
+                //acesso a dados, se ela acontecer a minha camada de serviço vai lançar uma excessão da
+                //camada dela e ai o meu controlador(SellersController) ele vai ter que lidar somente
+                //com as excessões da camada de serviço. Respeitando a arquitetura MVC
+                throw new DbConcurrencyException(e.Message);
+            }
         }
     }
 }

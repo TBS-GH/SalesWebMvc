@@ -11,7 +11,7 @@
 <h2>@ViewData["Title"]</h2>
 
 <p>
-    <a asp-action="Create" class="btn btn-default">Create New</a> 
+    <a asp-action="Create" class="btn btn-default">Create New</a>
 </p>
 
 <!--Criando a taebla qu vai ser exibida na tela-->
@@ -37,37 +37,34 @@
             <th></th> <!--adicioado um espaço em branco no titulo-->
         </tr>
     </thead>
+    <!--corpo da tabela-->
     <tbody>
         @foreach (var item in Model)
         {
             <!--para cada linha da tabela-->
-        <tr>
-            <!--para cada coluna<td>-->
-            <td>
-                @Html.DisplayFor(modelItem => item.Name);
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Email);
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.BirthDate);
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.BaseSalary);
-            </td>
-            <!--criando os links para editar, detalhes e deletar-->
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.Id">Edit</a>
-                <a asp-action="Details" asp-route-id="@item.Id">Details</a>
-                <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
-            </td>
-        </tr>
+            <tr>
+                <!--para cada coluna<td>-->
+                <td>
+                    @Html.DisplayFor(modelItem => item.Name)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Email)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.BirthDate)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.BaseSalary)
+                </td>
+                <!--criando os links para editar, detalhes e deletar-->
+                <td>
+                    <a asp-action="Edit" asp-route-id="@item.Id">|Edit|</a>
+                    <a asp-action="Details" asp-route-id="@item.Id">|Details|</a>
+                    <a asp-action="Delete" asp-route-id="@item.Id">|Delete|</a>
+                </td>
+            </tr>
         }
     </tbody>
-
-
-
 </table>
-
 
 <p>Sellers index page</p>
