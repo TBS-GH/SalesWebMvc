@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
@@ -81,7 +82,11 @@ namespace SalesWebMvc.Controllers
             //verifica se o id fornecido é nulo
             if (id == null)
             {
-                return NotFound();
+                //metodo mais simples de apresentar erro, ou seja, sem personalizar
+                //return NotFound();
+                //aqui vamos redirecionar para ação Error, e ela recebe um argumento que é a
+                //mensagem, criando um obj anonimo (que é new { ... })
+                return RedirectToAction(nameof(Error), new { message = "Id not provided" });
             }
 
             //buscando do banco de dados o vendedor
@@ -89,7 +94,8 @@ namespace SalesWebMvc.Controllers
             //se o id for nulo vamos apresentar esse erro
             if (obj == null)
             {
-                return NotFound();
+                //return NotFound();
+                return RedirectToAction(nameof(Error), new { message = "Id not found" });
             }
 
             return View(obj);
@@ -112,7 +118,8 @@ namespace SalesWebMvc.Controllers
             //verifica se o id fornecido é nulo
             if (id == null)
             {
-                return NotFound();
+                //return NotFound();
+                return RedirectToAction(nameof(Error), new { message = "Id not provided" });
             }
 
             //buscando do banco de dados o vendedor
@@ -120,7 +127,8 @@ namespace SalesWebMvc.Controllers
             //se o id for nulo vamos apresentar esse erro
             if (obj == null)
             {
-                return NotFound();
+                //return NotFound();
+                return RedirectToAction(nameof(Error), new { message = "Id not found" });
             }
 
             return View(obj);
@@ -132,13 +140,15 @@ namespace SalesWebMvc.Controllers
             //verificando se o id informado é nulo
             if (id == null)
             {
-                return NotFound();
+                //return NotFound();
+                return RedirectToAction(nameof(Error), new { message = "Id not privided" });
             }
             //verificando se o id existe no DB
             var obj = _sellerService.FindById(id.Value);
             if (obj == null)
             {
-                return NotFound();
+                //return NotFound();
+                return RedirectToAction(nameof(Error), new { message = "Id not found" });
             }
 
             //passndo dos teste vamos abrir a tela de edição, para isso temos que abrir a caixa de 
@@ -161,9 +171,9 @@ namespace SalesWebMvc.Controllers
             //verificando se o id do URL for difernete do is do Seller
             if (id != seller.Id)
             {
-                return BadRequest();
+                //return BadRequest();
+                return RedirectToAction(nameof(Error), new { message = "Id mismatch" });
             }
-
 
             //essa chamada de .update() ela pode gerar excessões (tanto um NotFoudException quanto
             //um DbConcurrencyException). Portanto devemos fazer essa chamada dentro de um bloco
@@ -174,14 +184,34 @@ namespace SalesWebMvc.Controllers
                 //agora vamos redirecionar a requisição para pagina inicial do crude, que é a index
                 return RedirectToAction(nameof(Index));
             }
-            catch (NotFoundException)
+            catch (ApplicationException e) //podemos simplificar os catchs com esse super tipo de Exception
             {
-                return NotFound();
+                return RedirectToAction(nameof(Error), new { message = e.Message });
             }
-            catch (DbConcurrencyException)
+            /*catch (NotFoundException e)
             {
-                return BadRequest();
+                return RedirectToAction(nameof(Error), new { message = e.Message });
             }
+            catch (DbConcurrencyException e)
+            {
+                return RedirectToAction(nameof(Error), new { message = e.Message });
+            }*/
+        }
+
+        //criando a ação Error, pra ela retornar a view de error (Error.cshtml)
+        public IActionResult Error(string message)
+        {
+            var viewModel = new ErrorViewModel
+            {
+                Message = message,
+                //tecnica para conseguir ter acesso ao id dentro da requisição
+                //esse Current? é opcional por causa do ?, se ele for nulo vamos usar o operador
+                //de coalecencia nula, e vou dizer que vou quere no lugar o objeto
+                // HttpContext.TraceIdentifier
+                RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier
+            };
+
+            return View(viewModel);
         }
     }
 }
