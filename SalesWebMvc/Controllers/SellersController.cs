@@ -25,19 +25,19 @@ namespace SalesWebMvc.Controllers
             _departmentService = departmentService;
         }
 
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
             //aqui ele vai cahamar o metodo FindAll() e retornar uma lista de Seller
-            var list = _sellerService.FindAll();
+            var list = await _sellerService.FindAllAsync();
             //aqui vamos passar esta lista list como argumento do método view, pra ele gerar
             //um IActionResult contendo esta lista list
             return View(list);
         }
 
-        public IActionResult Create()
+        public async Task<IActionResult> Create()
         {
             //aqui vamos ter que carregar e buscar do DB todos os departamentos no servico que criamos
-            var departments = _departmentService.FindAll();
+            var departments = await _departmentService.FindAllAsync();
             
             //vamos instanciar um obj viewModel
             var viewModel = new SellerFormViewModel { Departments = departments };
@@ -59,21 +59,21 @@ namespace SalesWebMvc.Controllers
         //vamos criar uma sobrecarga do metodo create, ela vai receber um objeto vendedor
         //que veio na requisição, para que eu receba essa objeto da requisição e instacie esse 
         //vendendor basta colocar como parametro o framework ja faz automaticamente pra gente
-        public IActionResult Create(Seller seller)
+        public async Task<IActionResult> Create(Seller seller)
         {
             //criando uma validação para evitar a criação de objetos vazios, caso
             //o Java script esteja desabilitado
             if (!ModelState.IsValid) //teste pra verificar se o modelo foi validado
             {
                 //lembrando que tem que ser um obj do tipo SellerFormViewModel
-                var departments = _departmentService.FindAll();
+                var departments = await _departmentService.FindAllAsync();
                 var viewModel = new SellerFormViewModel { Departments = departments, Seller = seller };
                 //caso não seja valido o seller vai ser repassado pra tela create
                 //até que seja feito de forma correta
                 return View(viewModel);
             }
             //aqui esta inserindo o obj seller
-            _sellerService.Insert(seller);
+            await _sellerService.InsertAsync(seller);
 
             //agora vamos redirecionar minha requisição para a ação index, que é a ação que vai 
             //mostrar novamente na tela principal meu crude de vendedores
@@ -88,7 +88,7 @@ namespace SalesWebMvc.Controllers
         }
 
         //criando a logica do controle do link Delete
-        public IActionResult Delete(int? id) //o int? significa que é opicional
+        public async Task<IActionResult> Delete(int? id) //o int? significa que é opicional
         {
             //verifica se o id fornecido é nulo
             if (id == null)
@@ -101,7 +101,7 @@ namespace SalesWebMvc.Controllers
             }
 
             //buscando do banco de dados o vendedor
-            var obj = _sellerService.FindById(id.Value);
+            var obj = await _sellerService.FindByIdAsync(id.Value);
             //se o id for nulo vamos apresentar esse erro
             if (obj == null)
             {
@@ -115,16 +115,16 @@ namespace SalesWebMvc.Controllers
         //criando o metodo Delete com Post
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Delete(int id)
+        public async Task<IActionResult> Delete(int id)
         {
             //removendo o Seller do DB
-            _sellerService.Remove(id);
+            await _sellerService.RemoveAsync(id);
             //vamos redirecionar para tela inical do meu crude
             return RedirectToAction(nameof(Index));
         }
 
         //criando a logica do controle do link Details
-        public IActionResult Details(int? id) //o int? significa que é opicional
+        public async Task<IActionResult> Details(int? id) //o int? significa que é opicional
         {
             //verifica se o id fornecido é nulo
             if (id == null)
@@ -134,7 +134,7 @@ namespace SalesWebMvc.Controllers
             }
 
             //buscando do banco de dados o vendedor
-            var obj = _sellerService.FindById(id.Value);
+            var obj = await _sellerService.FindByIdAsync(id.Value);
             //se o id for nulo vamos apresentar esse erro
             if (obj == null)
             {
@@ -146,7 +146,7 @@ namespace SalesWebMvc.Controllers
         }
 
         //metodo Edit para abrir a tela para editar o vendedor
-        public IActionResult Edit(int? id)
+        public async Task<IActionResult> Edit(int? id)
         {
             //verificando se o id informado é nulo
             if (id == null)
@@ -155,7 +155,7 @@ namespace SalesWebMvc.Controllers
                 return RedirectToAction(nameof(Error), new { message = "Id not privided" });
             }
             //verificando se o id existe no DB
-            var obj = _sellerService.FindById(id.Value);
+            var obj = await _sellerService.FindByIdAsync(id.Value);
             if (obj == null)
             {
                 //return NotFound();
@@ -164,7 +164,7 @@ namespace SalesWebMvc.Controllers
 
             //passndo dos teste vamos abrir a tela de edição, para isso temos que abrir a caixa de 
             //departamentos para povoar minha caixa de seleção
-            List<Department> departments = _departmentService.FindAll();
+            List<Department> departments = await _departmentService.FindAllAsync();
 
             //criando um obj do tipo SellerFormViewModel, já passando os dados. O Seller = obj, foi o
             //objeto que buscamos no DB, como estamos fazendo uma edição, vamos preencher com os dados
@@ -177,14 +177,14 @@ namespace SalesWebMvc.Controllers
         //criando o metodo Edit com Post
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Edit(int id, Seller seller)
+        public async Task<IActionResult> Edit(int id, Seller seller)
         {
             //criando uma validação para evitar a criação de objetos vazios, caso
             //o Java script esteja desabilitado
             if (!ModelState.IsValid) //teste pra verificar se o modelo foi validado
             {
                 //lembrando que tem que ser um obj do tipo SellerFormViewModel
-                var departments = _departmentService.FindAll();
+                var departments = await _departmentService.FindAllAsync();
                 var viewModel = new SellerFormViewModel { Departments = departments, Seller = seller };
                 //caso não seja valido o seller vai ser repassado pra tela create
                 //até que seja feito de forma correta
@@ -202,7 +202,7 @@ namespace SalesWebMvc.Controllers
             //try
             try
             {
-                _sellerService.Update(seller);
+                await _sellerService.UpdateAsync(seller);
                 //agora vamos redirecionar a requisição para pagina inicial do crude, que é a index
                 return RedirectToAction(nameof(Index));
             }

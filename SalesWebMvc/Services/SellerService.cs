@@ -20,7 +20,101 @@ namespace SalesWebMvc.Services
             _context = context;
         }
 
-        public List<Seller> FindAll()
+        //metodo Find All Assincrono
+        public async Task<List<Seller>> FindAllAsync()
+        {
+            //aqui vai acessar a minha fonte dados relacionada a tabela de vendedores
+            //e converter para uma lista
+            //por enquanto esta operação é assincrona, ou seja, ele vai rodar esse acesso ao banco de dados
+            //no comando abaixo e a aplicação vai ficar bloqueada esperando esta operação terminar.
+            return await _context.Seller.ToListAsync();
+        }
+
+        //metodo Insert Assincrono
+        public async Task InsertAsync(Seller obj)
+        {
+            //esse comando é só pra garantir que nao apareca o erro da criação de um novo seller
+            //colocando ele no primeiro departamento por default, mais pra frente iremos
+            //fazer uma alteração para selecionar o departamento que ele vai ser alocado
+            //  obj.Department = _context.Department.First();
+
+            //se usarmos apenas o add. não tem como confirmar que o objeto foi inserido
+            _context.Add(obj);
+
+            //para verificar se o obj vai ser inserio com sucesso no DB temos que usar o
+            //comando .SaveChanges
+            await _context.SaveChangesAsync();
+        }
+
+        //metodo Find by Id Assincrono
+        //aqui vai retornar um vendendor que possui o id informado, se o vendedor nao existir
+        //vai retornar null
+        public async Task<Seller> FindByIdAsync(int id)
+        {
+            //essa operação abaixo retorna apenas os dados(neste caso o Id) do vendedor,
+            //não é possivel retornar o Departamento dele, para isso devemos fazer:
+            // return _context.Seller.FirstOrDefault(obj => obj.Id == id);
+
+            //devemos incluir a operação .include() que faz parte do namespace
+            //Microsoft.EntityFrameworkCore, ele vai incluir o dado que desejarmos
+            //que no caso é o Departamento. Devemos colocalo antes da operação
+            //FirstOrDefault
+            //essa operação é chamada de EagerLoading: que é já carregar outros objetos associados
+            //a aquele obj principal
+            return await _context.Seller.Include(obj => obj.Department).FirstOrDefaultAsync(obj => obj.Id == id);
+        }
+
+        //metodo Remove Assincrono
+        public async Task RemoveAsync(int id)
+        {
+            //selecioando o vendedor que sera removido
+            var obj = await _context.Seller.FindAsync(id);
+            //aqui estamos removendo do DBset
+            _context.Seller.Remove(obj);
+            //aqui o framework tem que efeitivar lá no banco de dados
+            await _context.SaveChangesAsync();
+        }
+
+        //metodo Update Assincrono
+        //aqui vamos atualizar um obj do tipo Seller
+        public async Task UpdateAsync(Seller obj)
+        {
+            //primeiramente vamos verificar se o id desse obje tem no DB
+            //o metodo .Any() verifica se existe algum registro no DB com a condição que
+            //vc colocou como parametro. Lembrar que o ! significa se não achar o Id fornecido
+            bool hasAny = await _context.Seller.AnyAsync(x => x.Id == obj.Id);
+            if (!hasAny)
+            {
+                throw new NotFoundException("Id not found");
+            }            
+            
+            //**********OBSERVAÇÃO*********
+            //quando vc chama a função de atualizar o DB, o DB pode retornar uma excessão
+            //de conflito de concorrencia. Se esse erro ocorrer no DB, o entitie framwork vai
+            //produzir uma excessão chamda de DbUpdateConcurrencyException. Por isso devemos 
+            //colocar um bloco try
+            //*****************************            
+            try
+            {
+                //se passar por esse if, significa que vamos atualiza-lo
+                _context.Update(obj);
+                //salvando as alterações no DB
+                await _context.SaveChangesAsync();
+            }
+            catch (DbConcurrencyException e)
+            {
+                //se acontecer essa excessão aqui, do entitie framework vamos relançar uma outra
+                //excessão em nível de serviço que vai ser a DbConcurrencyException. Isso é muito importante
+                //para segregar as camadas. A camada de serviço não vai porpagar excessoes do nivel de 
+                //acesso a dados, se ela acontecer a minha camada de serviço vai lançar uma excessão da
+                //camada dela e ai o meu controlador(SellersController) ele vai ter que lidar somente
+                //com as excessões da camada de serviço. Respeitando a arquitetura MVC
+                throw new DbConcurrencyException(e.Message);
+            }
+        }
+
+        //************************ metodos em modo Sincrono ********************************
+        /*public List<Seller> FindAll()
         {
             //aqui vai acessar a minha fonte dados relacionada a tabela de vendedores
             //e converter para uma lista
@@ -29,7 +123,6 @@ namespace SalesWebMvc.Services
             return _context.Seller.ToList();
             //mai pra frente vamos transformar em operação mais otimizadas AGUARDEEEMMMMM
         }
-
         //inserindo um novo vendendor no DB
         public void Insert(Seller obj)
         {
@@ -106,6 +199,7 @@ namespace SalesWebMvc.Services
                 //com as excessões da camada de serviço. Respeitando a arquitetura MVC
                 throw new DbConcurrencyException(e.Message);
             }
-        }
+        }*/
+        //*******************************************************
     }
 }
