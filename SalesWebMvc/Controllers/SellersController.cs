@@ -168,7 +168,7 @@ namespace SalesWebMvc.Controllers
         [ValidateAntiForgeryToken]
         public IActionResult Edit(int id, Seller seller)
         {
-            //verificando se o id do URL for difernete do is do Seller
+            //verificando se o id do URL for difernete do id do Seller
             if (id != seller.Id)
             {
                 //return BadRequest();

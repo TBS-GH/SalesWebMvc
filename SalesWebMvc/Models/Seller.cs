@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -9,8 +10,27 @@ namespace SalesWebMvc.Models
     {
         public int Id { get; set; }
         public string Name { get; set; }
+
+        //podemos usar o datatype para email tb, que vai ficar um link pra enviar email direto pra pessoa
+        [DataType(DataType.EmailAddress)]
         public string Email { get; set; }
+
+        //************************************
+        //vamos definir aqui um custom lable para o BirthDate, para isso vamos usar a anotação
+        //[Display] a string que tiver dentro "" é que vai aparecer na tela
+        [Display(Name = "Birth Date")] //é assim q vc customiza o que vai aparecer no display
+        //agora vamos reitar as horas e minutos da data de nascimento com a tag [DataType]
+        [DataType(DataType.Date)]
+        [DisplayFormat(DataFormatString ="{0:dd/MM/yyyy}")]
         public DateTime BirthDate { get; set; }
+
+        //************************************
+        //aqui mostra o nome de forma correta
+        [Display(Name = "Base Salary")]
+        //aqui o valor do salario é apresentado com duas casas decimais. o zero dentro das chaves
+        //é pra indicar o valor do atributo, já o f2 é a quantidade de casas decimais. pra moeda
+        //basta colocar o :c2
+        [DisplayFormat(DataFormatString = "{0:c2}")]
         public double BaseSalary { get; set; }
         public Department Department { get; set; }
         //aqui estamos avisando o entitie do framework pra ele garantir que esse id vai ter que existir,
