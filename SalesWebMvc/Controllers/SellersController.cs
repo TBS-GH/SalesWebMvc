@@ -61,6 +61,17 @@ namespace SalesWebMvc.Controllers
         //vendendor basta colocar como parametro o framework ja faz automaticamente pra gente
         public IActionResult Create(Seller seller)
         {
+            //criando uma validação para evitar a criação de objetos vazios, caso
+            //o Java script esteja desabilitado
+            if (!ModelState.IsValid) //teste pra verificar se o modelo foi validado
+            {
+                //lembrando que tem que ser um obj do tipo SellerFormViewModel
+                var departments = _departmentService.FindAll();
+                var viewModel = new SellerFormViewModel { Departments = departments, Seller = seller };
+                //caso não seja valido o seller vai ser repassado pra tela create
+                //até que seja feito de forma correta
+                return View(viewModel);
+            }
             //aqui esta inserindo o obj seller
             _sellerService.Insert(seller);
 
@@ -168,6 +179,17 @@ namespace SalesWebMvc.Controllers
         [ValidateAntiForgeryToken]
         public IActionResult Edit(int id, Seller seller)
         {
+            //criando uma validação para evitar a criação de objetos vazios, caso
+            //o Java script esteja desabilitado
+            if (!ModelState.IsValid) //teste pra verificar se o modelo foi validado
+            {
+                //lembrando que tem que ser um obj do tipo SellerFormViewModel
+                var departments = _departmentService.FindAll();
+                var viewModel = new SellerFormViewModel { Departments = departments, Seller = seller };
+                //caso não seja valido o seller vai ser repassado pra tela create
+                //até que seja feito de forma correta
+                return View(viewModel);
+            }
             //verificando se o id do URL for difernete do id do Seller
             if (id != seller.Id)
             {
