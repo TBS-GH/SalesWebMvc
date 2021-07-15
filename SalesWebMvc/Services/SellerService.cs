@@ -67,12 +67,21 @@ namespace SalesWebMvc.Services
         //metodo Remove Assincrono
         public async Task RemoveAsync(int id)
         {
-            //selecioando o vendedor que sera removido
-            var obj = await _context.Seller.FindAsync(id);
-            //aqui estamos removendo do DBset
-            _context.Seller.Remove(obj);
-            //aqui o framework tem que efeitivar lá no banco de dados
-            await _context.SaveChangesAsync();
+            try
+            {
+                //selecioando o vendedor que sera removido
+                var obj = await _context.Seller.FindAsync(id);
+                //aqui estamos removendo do DBset
+                _context.Seller.Remove(obj);
+                //aqui o framework tem que efeitivar lá no banco de dados
+                await _context.SaveChangesAsync();
+            }
+            catch(DbUpdateException)
+            {
+                //msg direto do framework
+                //throw new IntegrityException(e.Message);
+                throw new IntegrityException("Can´t delete seller, because he/she has sales.");
+            }
         }
 
         //metodo Update Assincrono

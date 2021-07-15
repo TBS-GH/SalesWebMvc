@@ -117,10 +117,17 @@ namespace SalesWebMvc.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Delete(int id)
         {
-            //removendo o Seller do DB
-            await _sellerService.RemoveAsync(id);
-            //vamos redirecionar para tela inical do meu crude
-            return RedirectToAction(nameof(Index));
+            try
+            {
+                //removendo o Seller do DB
+                await _sellerService.RemoveAsync(id);
+                //vamos redirecionar para tela inical do meu crude
+                return RedirectToAction(nameof(Index));
+            }
+            catch(IntegrityException e)
+            {
+                return RedirectToAction(nameof(Error), new { message = e.Message });
+            }
         }
 
         //criando a logica do controle do link Details
